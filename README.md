@@ -1,97 +1,88 @@
-# Starwise · prototipo
+# STARWISE × ROLELAB
 
-**Data Spark · Talavera Valley Hackathon 2026 · Track 03 EdTech**
+**Explora tu camino. Vive el reto. Demuestra lo que sabes hacer.**
+Talavera Valley Hackathon 2026 · EdTech · prototipo académico en Streamlit.
 
-Starwise le da a los universitarios experiencia práctica documentada antes de su primer empleo.
-Chispa, nuestra guía, te pone frente al problema real de una empresa, te acompaña mientras lo
-resuelves y al final te entrega retroalimentación por competencias y un portafolio para tu CV.
+Juego narrativo de decisiones profesionales para universitarios de 18–25 años (negocios, mercadotecnia, finanzas). Complementa la formación universitaria: **no** es certificación, experiencia laboral formal ni garantía de empleo. Talavera Viva, Carmen Ruiz, La Espiga y Mirador son **ficticias**; sus datos son **sintéticos**.
 
-## Qué hace el prototipo
+## Recorrido
+| Etapa | Pantallas |
+|---|---|
+| Explorar | Portada con Chispa → perfil (18+, consentimiento, autoconfianza subjetiva) → elegir ruta → expectativa del rol |
+| Practicar | **Diagnóstico A** (sin tutor) → **Talavera Viva**: hablar con Carmen, carpeta de datos (ventas/clientes/costos con un duplicado intencional), presupuesto con **giro a $60,000 en el 4.º turno**, propuesta y defensa → reacción de Carmen |
+| Demostrar | **Demostración B** (otra empresa, sin tutor) → reflexión → logros (A vs B, cinco áreas, insignias) → portafolio |
+| Próximo paso | Mini ruta (requisitos ilustrativos, competencias observadas y no observadas, plan editable, ¿qué hace digno un primer empleo?) → encuesta y evidencia JSON |
 
-1. **Perfil:** carrera, semestre, intereses y autoevaluación inicial, con consentimiento si eres menor de 18.
-2. **Diagnóstico:** muestra datos reales del Repositorio EdTech para tu carrera (ingreso, % que trabaja
-   fuera de su campo, costo de la Ruta Base) y 3 situaciones rápidas que la IA lee.
-3. **Reto con cliente IA:** Carmen Ruiz, directora de *Talavera Viva* (empresa ficticia), necesita
-   recuperar ventas (−28%) antes del 31 de diciembre. El alumno pregunta, descubre información oculta,
-   enfrenta un **giro** (el presupuesto baja de $150,000 a $60,000), arma su propuesta y la **defiende**.
-   Tiene un límite de 20 minutos y Chispa da hasta 3 pistas.
-4. **Resultados:** un radar con 5 competencias **sin calificación**, evidencia, señales de proactividad,
-   el siguiente paso y un portafolio descargable.
-5. **Encuesta final:** se guarda como evidencia para "La prueba" (panel del equipo en la barra lateral).
+Siempre accesibles desde **Opciones · Mi progreso**: descargar evidencia, Metodología y fuentes, Acerca del proyecto, Panel del equipo y Reiniciar.
 
-## 🤖 Dónde está la IA
+Solo la ruta **Estrategia comercial y datos** está habilitada. «Analista BI» y «Analista financiero junior» aparecen como *Próximamente* y no son clicables: preferimos una aventura completa a tres que solo cambien el título.
 
-Toda la IA está en **`ia.py`**. En `app.py`, cada llamada está marcada con `# 🤖 IA:`.
-
-| Función | Qué hace la IA |
-| --- | --- |
-| `cliente_ia()` | Interpreta a Carmen, la clienta: responde solo lo que le preguntan y cuestiona propuestas débiles |
-| `tutor_ia()` | Es Chispa: da pistas socráticas sin dar la respuesta |
-| `diagnostico_ia()` | Lee las 3 situaciones y detecta el punto de partida |
-| `evaluar_ia()` | Evalúa la conversación, la propuesta y la defensa con la rúbrica, y devuelve evidencia |
-
-**Sin API key la app funciona igual, en "modo demo":** Carmen responde por reglas (`caso.py`) y la
-evaluación usa la rúbrica por reglas (`evaluacion.py`). Chispa se anima mientras "piensa", que es lo
-que en la versión con IA corresponde a la llamada al modelo.
-
-## Correrlo en tu computadora
-
-```
+## Ejecutar en macOS
+```bash
+cd starwise
+python3 -m venv .venv && source .venv/bin/activate    # Python 3.11 o superior
 pip install -r requirements.txt
-streamlit run app.py
+cp ~/Descargas/repositorio.csv data/repositorio.csv     # CSV oficial del reto, SIN modificarlo
+streamlit run app.py                                   # abre http://localhost:8501
 ```
+Para probar en tu celular dentro de la misma red Wi-Fi: `streamlit run app.py --server.address 0.0.0.0` y abre `http://<IP-de-tu-Mac>:8501` en Safari o Chrome.
 
-Se abre en el navegador, en `http://localhost:8501`.
+Pruebas: `pip install pytest && python -m pytest -q`.
+Regenerar los CSV sintéticos: `python datos.py`.
 
-## Publicarlo con link (para la prueba con usuarios y el jurado)
+## Streamlit Community Cloud
+1. Sube la carpeta a un repositorio de GitHub (el `.gitignore` excluye `secrets.toml` y las evidencias).
+2. En share.streamlit.io: *New app* → elige el repo → archivo principal `app.py`.
+3. (Opcional) *App settings → Secrets*: pega el contenido de `.streamlit/secrets.toml.example` con tu `GEMINI_API_KEY` y, si quieres, `FACILITADOR_PASSWORD`.
+4. Comparte la URL: funciona igual en laptop, tablet y celular.
 
-1. Sube esta carpeta a su repositorio de GitHub (por ejemplo, dentro de `codigo/`).
-2. Entra a **share.streamlit.io** con tu GitHub → **Create app** → elige el repo, la rama y el archivo
-   `app.py` (o `codigo/app.py`).
-3. Deploy. Te da un link `https://<nombre>.streamlit.app`. Hagan un QR con ese link para el pitch.
+**Almacenamiento:** el sistema de archivos de Streamlit Cloud es efímero y la app **no guarda nada en el servidor**. El estado vive en `st.session_state`: **recargar o cerrar la pestaña borra lo no exportado**. La evidencia real es el JSON que descarga cada participante.
 
-## (Opcional) Activar la IA real gratis
+## IA generativa (opcional)
+- Sin clave, Chispa funciona como **«Tutor demo por reglas»** (`chispa.py`, 37 escenarios) y lo dice en pantalla.
+- Con `GEMINI_API_KEY` (secrets o variable de entorno), Chispa usa Gemini por REST desde el servidor: modelo `GEMINI_MODEL` (por defecto `gemini-2.5-flash`), timeout de 12 s, 25 consultas por sesión, enfriamiento de 60 s ante un 429, y vuelta automática a las reglas si hay error. Toda la IA está en `ia.py`, con cada llamada marcada `# 🤖 IA:`.
+- Solo se envía contexto del caso ficticio. Las respuestas que parezcan revelar la solución se descartan. La IA **nunca** decide criterios de evaluación y está bloqueada durante A y B.
 
-1. Entra a Google AI Studio con una cuenta de Google y crea una API key. Revisen las condiciones de la
-   capa gratuita vigente antes de usarla.
-2. En Streamlit Cloud: tu app → **Settings → Secrets** y pega:
-   ```
-   GEMINI_API_KEY = "tu-key"
-   ```
-   En local: copia `.streamlit/secrets.toml.example` como `.streamlit/secrets.toml`.
-3. **Nunca subas la key a GitHub.** `secrets.toml` ya está en `.gitignore`.
+## Datos y fuentes
+- `data/repositorio.csv` **no está incluido** porque no se adjuntó. Colócalo en `data/` o cárgalo desde *Metodología → Fuentes* (solo para la sesión). Sin él, la simulación funciona completa y los datos de contexto aparecen como «no disponibles».
+- `datos.py` valida columnas exactas, encoding y separador. Cada indicador se busca por su **etiqueta exacta** (diccionario `INDICADORES`, sin `contains()` ni fuzzy matching) y se compara su valor. Si no coincide, queda como «requiere revisión» y no se muestra.
+- Indicadores que se usan en pantalla, cada uno solo donde corresponde: 30.4 % sin prestaciones en el primer empleo y 69.5 % con primer salario de hasta $10,000 (en *¿Qué hace digno un primer empleo?*), 47 % / 46.8 % de habilidades clave (solo si te interesan los datos), $17,795 (solo en *Contexto nacional*) y costos de 4 años (solo en *Ruta Base*). El selector de rutas **no muestra salarios**.
+- Sintéticos: `ventas_talavera.csv` (el total limpio cae **−28.0 %**; con el duplicado V-0072, −23.7 %; Restaurantes cae −38.1 %), `clientes_talavera.csv`, `costos_talavera.csv`, `evaluacion_A.csv` y `evaluacion_B.csv`.
 
-Si la key falla (sin internet o sin cuota), la app regresa sola al modo demo.
+## Evaluación
+`evaluacion.py` es determinista, está separado del tutor y versionado (`rubric_version`).
+- **A y B:** cuatro criterios objetivos (variación con tolerancia de ±0.5 pp, segmento con mayor caída, indicador pertinente, cifra del caso en la justificación). La calidad del texto queda **pendiente de revisión humana**. La comparación A/B describe un cambio observado, no una causa.
+- **Práctica:** cinco áreas (investigación, análisis, priorización, comunicación, adaptación) con niveles *Inicial / En desarrollo / Aplicado en el caso / Requiere revisión*.
+- No se usan la longitud del texto, la rapidez, el número de acciones, cuántas pistas se pidieron ni palabras clave. La rúbrica no tiene validación psicométrica.
 
-## La prueba con usuarios
-
-- Pásenle el link a 5–10 universitarios fuera del equipo. Cada uno hace el reto completo (unos 20 min).
-- La encuesta final registra: autoevaluación antes y después, si lo pondrían en su CV, comentarios,
-  minutos, pistas, temas descubiertos y nivel por competencia.
-- En la barra lateral, **Panel del equipo → Descargar evidencia (CSV)** y guárdenlo en `evidencia/`.
-- ⚠️ En Streamlit Cloud el archivo se borra si la app se reinicia: **descarguen el CSV después de cada
-  ronda de pruebas.**
-
-## Guion del demo (2–3 minutos)
-
-1. Perfil → diagnóstico: muestren la tarjeta con datos del Repositorio (cumple el requisito del dato).
-2. Reto: escriban, por ejemplo, *"¿Por qué cayeron las ventas?"*, *"¿Quiénes son sus clientes?"* (aparece
-   el hallazgo de las vajillas de boda) y *"¿Cuál es la meta del consejo?"*. Con la cuarta intervención
-   llega **el giro** y Chispa cambia de estado.
-3. Propuesta y defensa (tengan textos listos para pegar).
-4. Resultados: el radar, las señales de proactividad y el portafolio.
+## Prueba con usuarios (facilitador)
+1. *Opciones → Panel del equipo → Comenzar prueba con persona externa*: alias y declaración del facilitador.
+2. La persona juega de 10 a 20 minutos (puede tomar más, sin penalización) y al final descarga su `starwise_evidencia_*.json`.
+3. En el panel, importa varios JSON: se eliminan duplicados por `attempt_id` y puedes exportar el consolidado en CSV. Los registros `synthetic_test` de QA se excluyen de las métricas. Sin archivos, el panel muestra «Aún no hay pruebas».
 
 ## Estructura
-
 ```
-app.py           Pantallas y flujo (Streamlit)
-ia.py            🤖 Toda la IA (Gemini); sin key regresa None → modo demo
-caso.py          Caso Talavera Viva: hechos, giro, defensa y cliente por reglas
-evaluacion.py    Rúbrica de 5 competencias y evaluación por reglas
-datos.py         Lectura del Repositorio EdTech (data/repositorio.csv)
-chispa.py        Chispa en SVG con animaciones por estado
-assets/          Imágenes de Chispa
-evidencia/       sesiones.csv (se crea con la encuesta)
+app.py  ui.py  chispa.py  casos.py  datos.py  evaluacion.py  ia.py  portafolio.py  evidencia.py
+requirements.txt  .gitignore  .streamlit/config.toml  .streamlit/secrets.toml.example
+data/  (sintéticos + LEEME_repositorio.md; aquí va repositorio.csv)
+evidencia/.gitkeep   deck/README.md (pitch y demo de 2 min)
+tests/test_datos.py  tests/test_evaluacion.py  tests/test_caso_tutor_export.py  tests/test_app_flow.py
 ```
 
-*El caso usa una empresa ficticia. Starwise no otorga validez oficial de estudios.*
+## Verificaciones hechas y pendientes
+**Hechas en el entorno de desarrollo** (Python 3.13, pandas 3.0, Chrome; **sin Streamlit ni Plotly instalados ni red para instalarlos**):
+- `pytest`: 31 pruebas de lógica en verde (validación del CSV, reconciliación de datos, rúbrica, Carmen y el giro, tutor y caída a reglas ante un 429, escape de HTML, evidencia y deduplicación). `test_app_flow.py` se omite sin Streamlit.
+- Recorrido completo (perfil → A → Carmen y giro → datos → presupuesto → propuesta → B → portafolio → evidencia → panel del equipo) ejecutado con un **stub de Streamlit**. El stub imita los callbacks, la limpieza de widgets y los errores de session_state, pero **no es Streamlit real**.
+- Componentes HTML/CSS y portafolio renderizados en Chrome a 360, 390, 430, 768 y 1280 px: sin scroll horizontal y con botones de al menos 44 px.
+
+**Pendientes (hazlas antes de presentar):**
+1. `pip install -r requirements.txt && python -m pytest -q` (activa `test_app_flow.py`).
+2. `streamlit run app.py` y recorrer la demo completa en escritorio.
+3. En un celular real (Safari en iPhone y Chrome en Android): el teclado virtual con el chat, los sliders del presupuesto, las tablas y las descargas HTML/JSON.
+4. Copiar `repositorio.csv` y confirmar en *Metodología → Fuentes* que los indicadores salgan «Verificado». Si alguno sale «No encontrado», la etiqueta del CSV difiere: ajusta `INDICADORES` en `datos.py` **solo** si el texto oficial lo confirma.
+
+## Limitaciones conocidas
+- La rúbrica no está validada. Las encuestas son de opinión y no miden aprendizaje. El impacto sobre ingresos no está medido.
+- No hay persistencia en el servidor ni sincronización en tiempo real.
+- El desplazamiento automático al inicio de cada escena usa un pequeño iframe de componentes. Si el navegador lo bloquea, la app sigue funcionando.
+- El modelo comercial es una hipótesis: no hay ventas, convenios ni empresas aliadas.
